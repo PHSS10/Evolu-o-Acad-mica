@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Registro de Simulado</title>
+</head>
+<body>
+  <h2>Registro de Simulado</h2>
+
+  <form id="formSimulado" autocomplete="off">
+    <label>Data:
+      <input type="date" id="dataSimulado" required>
+    </label>
+    <label>Tipo de Simulado:
+      <select id="tipoSimulado" required>
+        <option value="">Selecione</option>
+        <option value="UNESP">UNESP</option>
+        <option value="FUVEST">FUVEST</option>
+        <option value="UNICAMP">UNICAMP</option>
+        <option value="ENEM">ENEM</option>
+      </select>
+    </label>
+    <label>Total de Questões:
+      <input type="number" id="totalQuestoes" min="1" required>
+    </label>
+    <label>Acertos Totais:
+      <input type="number" id="acertosTotais" min="0" required>
+    </label>
+    <label>Matéria:
+      <select id="materia" required>
+        <option value="">Selecione</option>
+        <option value="Português">Português</option>
+        <option value="Matemática">Matemática</option>
+        <option value="Biologia">Biologia</option>
+        <option value="Química">Química</option>
+        <option value="Física">Física</option>
+        <option value="Geografia">Geografia</option>
+        <option value="História">História</option>
+        <option value="Literatura">Literatura</option>
+      </select>
+    </label>
+    <label>Total de Questões da Matéria:
+      <input type="number" id="totalMateria" min="1" required>
+    </label>
+    <label>Acertos na Matéria:
+      <input type="number" id="acertosMateria" min="0" required>
+    </label>
+    <button type="button" onclick="gerarLinha()">Gerar Registro</button>
+  </form>
+
+  <div class="alerta" id="alerta" style="display:none;">
+    Dados gerados com sucesso! Copie e cole no Excel.
+  </div>
+
+  <div class="resultado" id="resultado"></div>
+
+  <script>
+    function gerarLinha() {
+      const dataSimulado = document.getElementById('dataSimulado').value;
+      const tipoSimulado = document.getElementById('tipoSimulado').value;
+      const totalQuestoes = Number(document.getElementById('totalQuestoes').value);
+      const acertosTotais = Number(document.getElementById('acertosTotais').value);
+      const materia = document.getElementById('materia').value;
+      const totalMateria = Number(document.getElementById('totalMateria').value);
+      const acertosMateria = Number(document.getElementById('acertosMateria').value);
+
+      const percentualGeral = ((acertosTotais / totalQuestoes) * 100).toFixed(2) + '%';
+      const percentualMat = ((acertosMateria / totalMateria) * 100).toFixed(2) + '%';
+
+      const payload = {
+        dataSimulado,
+        tipoSimulado,
+        totalQuestoes,
+        acertosTotais,
+        materia,
+        totalMateria,
+        acertosMateria,
+        percentualMat,
+        percentualGeral
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbwzb7rrCuWJO-PX8U7hcVhs1k0sdnwenmMx7jBZI7clZLw_mLqHXbPrZbttNCWQvrVj/exec', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => {
+        // Se o Apps Script retornar JSON, descomente a linha abaixo:
+        // return res.json();
+        // Se não retornar nada, apenas continue:
+        return {};
+      })
+      .then(response => {
+        // Se o Apps Script retornar {result: "sucesso"}, use o if abaixo:
+        // if(response.result === "sucesso"){
+        //   document.getElementById('alerta').innerText = "✅ Dados enviados com sucesso para o Google Sheets!";
+        // } else {
+        //   document.getElementById('alerta').innerText = "❌ Erro ao enviar dados: " + (response.message || "Erro desconhecido");
+        // }
+        // Para Apps Script padrão (sem retorno), apenas mostre sucesso:
+        document.getElementById('alerta').innerText = "✅ Dados enviados com sucesso para o Google Sheets!";
+        document.getElementById('alerta').style.display = 'block';
+        document.getElementById('resultado').innerText = "";
+        document.getElementById('formSimulado').reset();
+      })
+      .catch(err => {
+        document.getElementById('alerta').innerText = "❌ Erro de conexão: " + err.message;
+        document.getElementById('alerta').style.display = 'block';
+      });
+    }
+  </script>
+</body>
+</html>
